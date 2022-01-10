@@ -2,10 +2,14 @@ import os
 import sys
 
 import pygame
+import random
 
+pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
-size = width, height = 960, 500
+size = width, height = 970, 500
 screen = pygame.display.set_mode(size)
+screen.fill('white')
+pygame.display.set_caption('Trap cat by lazzzy')
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -18,14 +22,28 @@ def load_image(name, colorkey=None):
 all_sprites = pygame.sprite.Group()
 
 class Pole(pygame.sprite.Sprite):
-        image = load_image("pole.png")
+    pole = load_image("pole.png")
+    pole_close = load_image("pole_close.png")
 
-        def __init__(self, x, y, *group):
-            super().__init__(*group)
-            self.image = Pole.image
-            self.rect = self.image.get_rect()
-            self.rect.y = y
-            self.rect.x = x
+    def __init__(self, x, y, is_active=True, *group):
+        super().__init__(*group)
+        self.image = Pole.pole if is_active else Pole.pole_close
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+
+
+class Cat(pygame.sprite.Sprite):
+    image = load_image("cat_stay.png")
+
+
+    def __init__(self, x, y, *group):
+        super().__init__(*group)
+        self.image = Cat.image
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+
 
 for i in range(11):
     for j in range(11):
@@ -34,7 +52,23 @@ for i in range(11):
             x = 0 + j * 85
         else:
             x = 40 + j * 85
-        Pole(x, y, all_sprites)
+        count = 8
+        all_count = 121
+        if random.randint(1, all_count) <= count:
+            if i == 6 and j == 6:
+                Pole(x, y, True, all_sprites)
+                all_count -= 1
+            else:
+                Pole(x, y, False, all_sprites)
+                all_count -= 1
+                count -= 1
+        else:
+            Pole(x, y, True, all_sprites)
+            all_count -= 1
+
+x = 430
+y = 190
+Cat(x, y, all_sprites)
 
 running = True
 
