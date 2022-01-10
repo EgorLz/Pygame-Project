@@ -11,6 +11,7 @@ screen = pygame.display.set_mode(size)
 screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
 
+
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
@@ -19,7 +20,9 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     return image
 
+
 all_sprites = pygame.sprite.Group()
+
 
 class Pole(pygame.sprite.Sprite):
     pole = load_image("pole.png")
@@ -35,7 +38,6 @@ class Pole(pygame.sprite.Sprite):
 
 class Cat(pygame.sprite.Sprite):
     image = load_image("cat_stay.png")
-
 
     def __init__(self, x, y, *group):
         super().__init__(*group)
