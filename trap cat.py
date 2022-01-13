@@ -27,7 +27,7 @@ def terminate():
     sys.exit()
 
 def start_screen():
-    intro_text = ["Press any key"]
+    intro_text = ["Press space"]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
@@ -46,11 +46,12 @@ def start_screen():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                return
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    return
         pygame.display.flip()
         clock.tick(FPS)
+
 
 all_sprites = pygame.sprite.Group()
 
