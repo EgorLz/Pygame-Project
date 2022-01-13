@@ -3,6 +3,7 @@ import sys
 
 import pygame
 import random
+import time
 
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
@@ -26,18 +27,18 @@ def terminate():
     sys.exit()
 
 def start_screen():
-    intro_text = ""
+    intro_text = ["Press any key"]
 
     fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
-    font = pygame.font.Font(None, 30)
-    text_coord = 50
+    font = pygame.font.Font(None, 50)
+    text_coord = height // 4 * 3
     for line in intro_text:
-        string_rendered = font.render(line, 1, pygame.Color('white'))
+        string_rendered = font.render(line, 1, pygame.Color('Black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10
+        intro_rect.x = width // 2 - 100
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
 
@@ -47,7 +48,7 @@ def start_screen():
                 terminate()
             elif event.type == pygame.KEYDOWN or \
                     event.type == pygame.MOUSEBUTTONDOWN:
-                return  # начинаем игру
+                return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -66,9 +67,12 @@ class Pole(pygame.sprite.Sprite):
         self.rect.x = x
 
     def update(self, *args):
+        global start_time
         if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
                 self.rect.collidepoint(args[0].pos):
-            self.image = Pole.pole_close
+            if time.time() - start_time >= 0.7:
+                self.image = Pole.pole_close
+                start_time = time.time()
 
 
 class Cat(pygame.sprite.Sprite):
@@ -107,11 +111,14 @@ start_pos_x = 430
 start_pos_y = 190
 Cat(start_pos_x, start_pos_y, all_sprites)
 
+start_time = time.time()
+
 running = True
 
 clock = pygame.time.Clock()
 start_screen()
 while running:
+    screen.fill('white')
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
