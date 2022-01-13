@@ -35,6 +35,11 @@ class Pole(pygame.sprite.Sprite):
         self.rect.y = y
         self.rect.x = x
 
+    def update(self, *args):
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.image = Pole.pole_close
+
 
 class Cat(pygame.sprite.Sprite):
     image = load_image("cat_stay.png")
@@ -68,9 +73,9 @@ for i in range(11):
             Pole(x, y, True, all_sprites)
             all_count -= 1
 
-x = 430
-y = 190
-Cat(x, y, all_sprites)
+start_pos_x = 430
+start_pos_y = 190
+Cat(start_pos_x, start_pos_y, all_sprites)
 
 running = True
 
@@ -78,6 +83,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        all_sprites.update(event)
     all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
