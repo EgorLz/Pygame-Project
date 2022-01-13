@@ -7,6 +7,7 @@ import random
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
 size = width, height = 970, 500
+FPS = 60
 screen = pygame.display.set_mode(size)
 screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
@@ -20,6 +21,35 @@ def load_image(name, colorkey=None):
     image = pygame.image.load(fullname)
     return image
 
+def terminate():
+    pygame.quit()
+    sys.exit()
+
+def start_screen():
+    intro_text = ""
+
+    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN or \
+                    event.type == pygame.MOUSEBUTTONDOWN:
+                return  # начинаем игру
+        pygame.display.flip()
+        clock.tick(FPS)
 
 all_sprites = pygame.sprite.Group()
 
@@ -79,6 +109,8 @@ Cat(start_pos_x, start_pos_y, all_sprites)
 
 running = True
 
+clock = pygame.time.Clock()
+start_screen()
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
