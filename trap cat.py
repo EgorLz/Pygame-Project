@@ -29,7 +29,7 @@ def terminate():
 def start_screen():
     intro_text = ["Press space"]
 
-    fon = pygame.transform.scale(load_image('fon.jpg'), (width, height))
+    fon = pygame.transform.scale(load_image('fon.png'), (width, height))
     screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 50)
     text_coord = height // 4 * 3
