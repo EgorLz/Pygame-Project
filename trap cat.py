@@ -54,18 +54,21 @@ def start_screen():
 
 
 all_sprites = pygame.sprite.Group()
+board = [[0] * 11 for _ in range(11)]
 
 
 class Pole(pygame.sprite.Sprite):
     pole = load_image("pole.png")
     pole_close = load_image("pole_close.png")
 
-    def __init__(self, x, y, is_active=True, *group):
+    def __init__(self, x, y, pos_x, pos_y, is_active=True, *group):
         super().__init__(*group)
         self.image = Pole.pole if is_active else Pole.pole_close
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
     def update(self, *args):
         global start_time
@@ -79,13 +82,20 @@ class Pole(pygame.sprite.Sprite):
 class Cat(pygame.sprite.Sprite):
     image = load_image("cat_stay.png")
 
-    def __init__(self, x, y, *group):
+    def __init__(self, x, y, pos_x, pos_y, *group):
         super().__init__(*group)
         self.image = Cat.image
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+        self.pos_x = pos_x
+        self.pos_y = pos_y
 
+
+    def check_pole(self):
+        if board[self.pos_y][self.pos_x - 1] == 0:
+            self.pos_x -= 1
+            self.rect.x -= 80
 
 for i in range(11):
     for j in range(11):
@@ -98,19 +108,22 @@ for i in range(11):
         all_count = 121
         if random.randint(1, all_count) <= count:
             if i == 6 and j == 6:
-                Pole(x, y, True, all_sprites)
+                Pole(x, y, j, i, True, all_sprites)
                 all_count -= 1
             else:
-                Pole(x, y, False, all_sprites)
+                Pole(x, y, j, i, False, all_sprites)
+                board[i][j] = 1
                 all_count -= 1
                 count -= 1
         else:
-            Pole(x, y, True, all_sprites)
+            Pole(x, y, j, i, True, all_sprites)
             all_count -= 1
 
-start_pos_x = 430
-start_pos_y = 190
-Cat(start_pos_x, start_pos_y, all_sprites)
+pos_x = 430
+pos_y = 190
+cat_x = 6
+cat_y = 6
+Cat(pos_x, pos_y, cat_x, cat_y, all_sprites)
 
 start_time = time.time()
 
@@ -127,6 +140,7 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
         all_sprites.update(event)
+        Cat.check_pole(Cat(pos_x, pos_y, cat_x, cat_y, all_sprites))
     all_sprites.draw(screen)
     pygame.display.flip()
 pygame.quit()
