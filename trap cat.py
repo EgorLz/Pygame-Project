@@ -143,19 +143,74 @@ class Cat(pygame.sprite.Sprite):
         else:
             return False
 
+    def check_pole_r(self):
+        if board[self.pos_y][self.pos_x + 1] == 0:
+            return True
+        else:
+            return False
+
+    def check_pole_rh(self):
+        if board[self.pos_y - 1][self.pos_x + 1] == 0:
+            return True
+        else:
+            return False
+
+    def check_pole_rl(self):
+        if board[self.pos_y + 1][self.pos_x + 1] == 0:
+            return True
+        else:
+            return False
+
     def move_l(self):
         self.rect.x -= 85
         self.pos_x -= 1
 
     def move_lh(self):
         self.pos_y -= 1
+        self.rect.x -= 42
+        self.rect.y -= 50
 
     def move_ll(self):
         self.pos_y += 1
+        self.rect.x -= 42
+        self.rect.y += 50
+
+    def move_r(self):
+        self.rect.x += 85
+        self.pos_x += 1
+
+    def move_rh(self):
+        self.pos_y -= 1
+        self.pos_x += 1
+        self.rect.x += 42
+        self.rect.y -= 50
+
+    def move_rl(self):
+        self.pos_y += 1
+        self.pos_x += 1
+        self.rect.x += 42
+        self.rect.y += 50
 
     def update(self):
-        if self.check_pole_l():
-            self.move_l()
+            if self.check_pole_l():
+                self.move_l()
+            elif self.check_pole_lh():
+                self.move_lh()
+            elif self.check_pole_ll():
+                self.move_ll()
+            else:
+                if self.check_pole_r():
+                    self.move_r()
+                elif self.check_pole_rh():
+                    self.move_lh()
+                elif self.check_pole_rl():
+                    self.move_ll()
+                else:
+                    print("Win")
+            if (970 < self.rect.x < 0) or (500 < self.rect.y < 0):
+                print("Loss")
+
+
 
 
 n = 8
@@ -222,7 +277,10 @@ def main():
             manager.process_events(event)
             all_sprites.update()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                hero.update()
+                try:
+                    hero.update()
+                except IndexError:
+                    pass
         all_sprites.draw(screen)
         hero.draw(screen)
         manager.update(time_delta)
