@@ -291,10 +291,10 @@ def main():
                         all_sprites.update()
                     except IndexError:
                         pass
+        screen.blit(background, (970, 0))
         all_sprites.draw(screen)
         hero.draw(screen)
         manager.update(time_delta)
-        screen.blit(background, (970, 0))
         manager.draw_ui(screen)
         pygame.display.flip()
     pygame.quit()
