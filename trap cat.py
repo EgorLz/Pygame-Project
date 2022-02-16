@@ -8,39 +8,40 @@ import time
 
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
-size = width, height = 970, 500
+size = width, height = 1100, 500
 FPS = 60
 screen = pygame.display.set_mode(size)
-background = pygame.Surface((970, 500))
-background.fill(pygame.Color('white'))
+background = pygame.Surface((130, 500))
+background.fill(pygame.Color('grey'))
 screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
 
-manager = pygame_gui.UIManager((970, 500))
+manager = pygame_gui.UIManager((1100, 500))
 
-# start_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((435, 300), (100, 50)),
-#                                             text='Start',
-#                                             manager=manager)
-#
-# diifculti1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350, 200), (50, 50)),
-#                                             text='1',
-#                                             manager=manager)
-#
-# diifculti2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((400, 200), (50, 50)),
-#                                             text='2',
-#                                             manager=manager)
-#
-# diifculti3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((450, 200), (50, 50)),
-#                                             text='3',
-#                                             manager=manager)
-#
-# diifculti4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((500, 200), (50, 50)),
-#                                             text='4',
-#                                             manager=manager)
-#
-# diifculti5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((550, 200), (50, 50)),
-#                                             text='5',
-#                                             manager=manager)
+
+start_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((985, 110), (100, 50)),
+                                            text='Start',
+                                            manager=manager)
+
+diifculti1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 160), (50, 50)),
+                                            text='1',
+                                            manager=manager)
+
+diifculti2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 210), (50, 50)),
+                                            text='2',
+                                            manager=manager)
+
+diifculti3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 260), (50, 50)),
+                                            text='3',
+                                            manager=manager)
+
+diifculti4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 310), (50, 50)),
+                                            text='4',
+                                            manager=manager)
+
+diifculti5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 360), (50, 50)),
+                                            text='5',
+                                            manager=manager)
 
 
 def load_image(name, colorkey=None):
@@ -192,28 +193,31 @@ class Cat(pygame.sprite.Sprite):
         self.rect.y += 50
 
     def update(self):
-            if self.check_pole_l():
-                self.move_l()
-            elif self.check_pole_lh():
+        if (970 < self.rect.x < 0) or (500 < self.rect.y < 0):
+            print("Loss")
+        if self.check_pole_l():
+            self.move_l()
+        elif self.check_pole_lh():
+            self.move_lh()
+        elif self.check_pole_ll():
+            self.move_ll()
+        else:
+            if self.check_pole_r():
+                self.move_r()
+            elif self.check_pole_rh():
                 self.move_lh()
-            elif self.check_pole_ll():
+            elif self.check_pole_rl():
                 self.move_ll()
             else:
-                if self.check_pole_r():
-                    self.move_r()
-                elif self.check_pole_rh():
-                    self.move_lh()
-                elif self.check_pole_rl():
-                    self.move_ll()
-                else:
-                    print("Win")
-            if (970 < self.rect.x < 0) or (500 < self.rect.y < 0):
-                print("Loss")
+                print("Win")
+
+    def restart(self):
+        self.rect.x = 430
+        self.rect.y = 190
+        self.pos_x = 6
+        self.pos_y = 6
 
 
-
-
-n = 8
 def drawpole(n):
     for i in range(11):
         for j in range(11):
@@ -237,6 +241,7 @@ def drawpole(n):
                 Pole(x, y, j, i, True, all_sprites)
                 all_count -= 1
 
+
 pos_x = 430
 pos_y = 190
 cat_x = 6
@@ -245,9 +250,11 @@ cat_y = 6
 start_time = time.time()
 
 clock = pygame.time.Clock()
+
+
 def main():
     running = True
-
+    n = 8
     start_screen()
     drawpole(n)
     cat = Cat(pos_x, pos_y, cat_x, cat_y, hero)
@@ -260,34 +267,38 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-            # if event.type == pygame_gui.UI_BUTTON_PRESSED:
-            #     n = 8
-            #     if event.ui_element == diifculti1:
-            #         n = 10
-            #     if event.ui_element == diifculti2:
-            #         n = 8
-            #     if event.ui_element == diifculti3:
-            #         n = 6
-            #     if event.ui_element == diifculti4:
-            #         n = 5
-            #     if event.ui_element == diifculti5:
-            #         n = 4
-            #     if event.ui_element == start_btn:
-            #         drawpole(n)
+            if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                n = 8
+                if event.ui_element == diifculti1:
+                    n = 10
+                if event.ui_element == diifculti2:
+                    n = 8
+                if event.ui_element == diifculti3:
+                    n = 6
+                if event.ui_element == diifculti4:
+                    n = 5
+                if event.ui_element == diifculti5:
+                    n = 4
+                if event.ui_element == start_btn:
+                    cat.restart()
+                    drawpole(n)
             manager.process_events(event)
             all_sprites.update()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                try:
-                    hero.update()
-                except IndexError:
-                    pass
+                if event.type != pygame_gui.UI_BUTTON_PRESSED:
+                    try:
+                        hero.update()
+                        all_sprites.update()
+                    except IndexError:
+                        pass
         all_sprites.draw(screen)
         hero.draw(screen)
         manager.update(time_delta)
-        # # screen.blit(background, (0, 0))
-        # # manager.draw_ui(screen)
+        screen.blit(background, (970, 0))
+        manager.draw_ui(screen)
         pygame.display.flip()
     pygame.quit()
+
 
 if __name__ == "__main__":
     main()
