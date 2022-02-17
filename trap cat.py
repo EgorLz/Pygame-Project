@@ -100,19 +100,26 @@ def info_screen():
                   "Задача: поймать кошку так, чтобы",
                   " она не могла никуда пойти"]
 
+    return_text = ["Нажмите ё для выхода"]
+    pygame.display.set_mode((500, 500))
     pygame.display.set_caption('INFO by lazzzy')
     fon = pygame.transform.scale(load_image('info.jpg'), (500, 500))
-    screen.blit(fon, (300, 0))
+    screen.blit(fon, (0, 0))
     font = pygame.font.Font(None, 25)
-    text_coord = height // 4
+    text_coord = height // 4 + 10
     for line in intro_text:
         string_rendered = font.render(line, 1, pygame.Color('Green'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = width // 2 - 125
+        intro_rect.x = 100
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
+    for line in return_text:
+        font = pygame.font.Font(None, 25)
+        string_rendered = font.render(line, 1, pygame.Color('Black'))
+        screen.blit(string_rendered, (125, 400))
 
     while True:
         for event in pygame.event.get():
@@ -126,6 +133,8 @@ def info_screen():
         clock.tick(FPS)
 
 all_sprites = pygame.sprite.Group()
+pole_group = pygame.sprite.Group()
+
 hero = pygame.sprite.Group()
 board = [[0] * 11 for _ in range(11)]
 
@@ -145,8 +154,7 @@ class Pole(pygame.sprite.Sprite):
 
     def update(self, *args):
         global start_time
-        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
-                self.rect.collidepoint(args[0].pos):
+        if args and self.rect.collidepoint(args[0].pos):
             if time.time() - start_time >= 0.7:
                 self.image = Pole.pole_close
                 start_time = time.time()
@@ -269,10 +277,10 @@ def drawpole(n):
             all_count = 121
             if random.randint(1, all_count) <= count:
                 if i == 6 and j == 6:
-                    Pole(x, y, j, i, True, all_sprites)
+                    Pole(x, y, j, i, True, all_sprites, pole_group)
                     all_count -= 1
                 else:
-                    Pole(x, y, j, i, False, all_sprites)
+                    Pole(x, y, j, i, False, all_sprites, pole_group)
                     board[i][j] = 1
                     all_count -= 1
                     count -= 1
@@ -280,11 +288,6 @@ def drawpole(n):
                 Pole(x, y, j, i, True, all_sprites)
                 all_count -= 1
 
-def info():
-    siz = w, h = 500, 300
-    info = pygame.display.set_mode(siz)
-    info.fill('white')
-    pygame.display.set_caption('INFO by lazzzy')
 
 
 pos_x = 430
@@ -298,9 +301,10 @@ clock = pygame.time.Clock()
 
 
 def main():
+    global board
     running = True
     n = 8
-    start_screen()
+    # start_screen()
     drawpole(n)
     cat = Cat(pos_x, pos_y, cat_x, cat_y, hero)
     while running:
@@ -333,14 +337,16 @@ def main():
                 if event.ui_element == start_btn:
                     cat.restart()
                     level_sound.play()
+                    board = [[0] * 11 for _ in range(11)]
                     drawpole(n)
                 if event.ui_element == info_btn:
                     open_sound.play()
                     info_screen()
+                    pygame.display.set_mode(size)
             manager.process_events(event)
-            all_sprites.update()
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                all_sprites.update()
+                pole_group.update(event)
                 if event.type != pygame_gui.UI_BUTTON_PRESSED:
                     try:
                         hero.update()
@@ -349,6 +355,7 @@ def main():
         screen.blit(background, (970, 0))
         all_sprites.draw(screen)
         hero.draw(screen)
+        all_sprites.update()
         manager.update(time_delta)
         manager.draw_ui(screen)
         pygame.display.flip()
