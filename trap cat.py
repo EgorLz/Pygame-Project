@@ -314,22 +314,28 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     running = False
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                n = 8
-                open_sound.play()
+                n = 10
                 if event.ui_element == diifculti1:
-                    n = 10
+                    n = 15
+                    open_sound.play()
                 if event.ui_element == diifculti2:
-                    n = 8
+                    n = 10
+                    open_sound.play()
                 if event.ui_element == diifculti3:
-                    n = 6
+                    n = 8
+                    open_sound.play()
                 if event.ui_element == diifculti4:
-                    n = 5
+                    n = 7
+                    open_sound.play()
                 if event.ui_element == diifculti5:
-                    n = 4
+                    n = 6
+                    open_sound.play()
                 if event.ui_element == start_btn:
                     cat.restart()
+                    level_sound.play()
                     drawpole(n)
                 if event.ui_element == info_btn:
+                    open_sound.play()
                     info_screen()
             manager.process_events(event)
             all_sprites.update()
