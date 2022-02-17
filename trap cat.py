@@ -43,6 +43,9 @@ diifculti5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 360),
                                             text='5',
                                             manager=manager)
 
+info_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 460), (40, 40)),
+                                            text='?',
+                                            manager=manager)
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -241,6 +244,12 @@ def drawpole(n):
                 Pole(x, y, j, i, True, all_sprites)
                 all_count -= 1
 
+def info():
+    siz = w, h = 500, 300
+    info = pygame.display.set_mode(siz)
+    info.fill('white')
+    pygame.display.set_caption('INFO by lazzzy')
+
 
 pos_x = 430
 pos_y = 190
@@ -260,6 +269,7 @@ def main():
     cat = Cat(pos_x, pos_y, cat_x, cat_y, hero)
     while running:
         time_delta = clock.tick(60) / 1000.0
+        clock.tick(FPS)
         screen.fill('white')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -282,13 +292,15 @@ def main():
                 if event.ui_element == start_btn:
                     cat.restart()
                     drawpole(n)
+                if event.ui_element == info_btn:
+                    info()
             manager.process_events(event)
             all_sprites.update()
             if event.type == pygame.MOUSEBUTTONDOWN:
+                all_sprites.update()
                 if event.type != pygame_gui.UI_BUTTON_PRESSED:
                     try:
                         hero.update()
-                        all_sprites.update()
                     except IndexError:
                         pass
         screen.blit(background, (970, 0))
