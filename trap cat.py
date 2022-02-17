@@ -17,6 +17,8 @@ screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
 pygame.mixer.music.load('data/music/inecraft_excuse.mp3')
 open_sound = pygame.mixer.Sound('data/music/inecraft_chest_open.mp3')
+level_sound = pygame.mixer.Sound("data/music/inecraft_level_u.mp3")
+deathe_sound = pygame.mixer.Sound("data/music/inecraft_death.mp3")
 pygame.mixer.music.play()
 
 manager = pygame_gui.UIManager((1100, 500))
@@ -91,6 +93,37 @@ def start_screen():
         pygame.display.flip()
         clock.tick(FPS)
 
+def info_screen():
+    intro_text = ["Правила:",
+                  "Кликая по клеточкам вы не даете ",
+                  "кошке на них прыгать",
+                  "Задача: поймать кошку так, чтобы",
+                  " она не могла никуда пойти"]
+
+    pygame.display.set_caption('INFO by lazzzy')
+    fon = pygame.transform.scale(load_image('info.jpg'), (500, 500))
+    screen.blit(fon, (300, 0))
+    font = pygame.font.Font(None, 25)
+    text_coord = height // 4
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('Green'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = width // 2 - 125
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.KEYDOWN:
+                return
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                return
+        pygame.display.flip()
+        clock.tick(FPS)
 
 all_sprites = pygame.sprite.Group()
 hero = pygame.sprite.Group()
@@ -297,7 +330,7 @@ def main():
                     cat.restart()
                     drawpole(n)
                 if event.ui_element == info_btn:
-                    info()
+                    info_screen()
             manager.process_events(event)
             all_sprites.update()
             if event.type == pygame.MOUSEBUTTONDOWN:
