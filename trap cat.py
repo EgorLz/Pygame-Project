@@ -15,6 +15,9 @@ background = pygame.Surface((130, 500))
 background.fill(pygame.Color('grey'))
 screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
+pygame.mixer.music.load('data/music/inecraft_excuse.mp3')
+open_sound = pygame.mixer.Sound('data/music/inecraft_chest_open.mp3')
+pygame.mixer.music.play()
 
 manager = pygame_gui.UIManager((1100, 500))
 
@@ -279,6 +282,7 @@ def main():
                     running = False
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 n = 8
+                open_sound.play()
                 if event.ui_element == diifculti1:
                     n = 10
                 if event.ui_element == diifculti2:
