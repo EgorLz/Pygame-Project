@@ -8,11 +8,11 @@ import time
 
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
-size = width, height = 1100, 500
+size = width, height = 1150, 500
 FPS = 60
 screen = pygame.display.set_mode(size)
 background = pygame.Surface((130, 500))
-background.fill(pygame.Color('grey'))
+background.fill(pygame.Color('white'))
 screen.fill('white')
 pygame.display.set_caption('Trap cat by lazzzy')
 pygame.mixer.music.load('data/music/inecraft_excuse.mp3')
@@ -21,36 +21,36 @@ level_sound = pygame.mixer.Sound("data/music/inecraft_level_u.mp3")
 deathe_sound = pygame.mixer.Sound("data/music/inecraft_death.mp3")
 pygame.mixer.music.play()
 
-manager = pygame_gui.UIManager((1100, 500))
+manager = pygame_gui.UIManager((1150, 500))
 
+start_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1035, 110), (100, 50)),
+                                         text='Start',
+                                         manager=manager)
 
-start_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((985, 110), (100, 50)),
-                                            text='Start',
-                                            manager=manager)
+diifculti1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 160), (50, 50)),
+                                          text='1',
+                                          manager=manager)
 
-diifculti1 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 160), (50, 50)),
-                                            text='1',
-                                            manager=manager)
+diifculti2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 210), (50, 50)),
+                                          text='2',
+                                          manager=manager)
 
-diifculti2 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 210), (50, 50)),
-                                            text='2',
-                                            manager=manager)
+diifculti3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 260), (50, 50)),
+                                          text='3',
+                                          manager=manager)
 
-diifculti3 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 260), (50, 50)),
-                                            text='3',
-                                            manager=manager)
+diifculti4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 310), (50, 50)),
+                                          text='4',
+                                          manager=manager)
 
-diifculti4 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 310), (50, 50)),
-                                            text='4',
-                                            manager=manager)
+diifculti5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 360), (50, 50)),
+                                          text='5',
+                                          manager=manager)
 
-diifculti5 = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1010, 360), (50, 50)),
-                                            text='5',
-                                            manager=manager)
+info_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1110, 460), (40, 40)),
+                                        text='?',
+                                        manager=manager)
 
-info_btn = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((1060, 460), (40, 40)),
-                                            text='?',
-                                            manager=manager)
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -93,6 +93,7 @@ def start_screen():
         pygame.display.flip()
         clock.tick(FPS)
 
+
 def info_screen():
     intro_text = ["Правила:",
                   "Кликая по клеточкам вы не даете ",
@@ -132,11 +133,41 @@ def info_screen():
         pygame.display.flip()
         clock.tick(FPS)
 
+
 all_sprites = pygame.sprite.Group()
 pole_group = pygame.sprite.Group()
+music_group = pygame.sprite.Group()
 
 hero = pygame.sprite.Group()
 board = [[0] * 11 for _ in range(11)]
+
+
+class Music(pygame.sprite.Sprite):
+    is_active = True
+    svyk = load_image("+звук.jpg")
+    svykno = load_image("-звук.jpg")
+
+    def __init__(self, x, y, is_active=True, *group):
+        super().__init__(*group)
+        self.image = Music.svyk
+        self.rect = self.image.get_rect()
+
+        self.rect.y = y
+        self.rect.x = x
+
+    def update(self, *args):
+        global start_time
+        if args and self.rect.collidepoint(args[0].pos):
+            if time.time() - start_time >= 0.7:
+                start_time = time.time()
+                if Music.is_active:
+                    self.image = Music.svykno
+                    Music.is_active = False
+                    pygame.mixer.music.set_volume(0)
+                else:
+                    self.image = Music.svyk
+                    Music.is_active = True
+                    pygame.mixer.music.set_volume(1)
 
 
 class Pole(pygame.sprite.Sprite):
@@ -147,6 +178,7 @@ class Pole(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = Pole.pole if is_active else Pole.pole_close
         self.rect = self.image.get_rect()
+
         self.rect.y = y
         self.rect.x = x
         self.pos_x = pos_x
@@ -158,7 +190,7 @@ class Pole(pygame.sprite.Sprite):
             if time.time() - start_time >= 0.7:
                 self.image = Pole.pole_close
                 start_time = time.time()
-                board[pos_x][pos_y] = 1
+                # board[pos_x][pos_y] = 1
 
 
 class Cat(pygame.sprite.Sprite):
@@ -240,7 +272,7 @@ class Cat(pygame.sprite.Sprite):
         self.rect.y += 50
 
     def update(self):
-        if (970 < self.rect.x < 0) or (500 < self.rect.y < 0):
+        if self.rect.x < 0:
             print("Loss")
         if self.check_pole_l():
             self.move_l()
@@ -248,15 +280,15 @@ class Cat(pygame.sprite.Sprite):
             self.move_lh()
         elif self.check_pole_ll():
             self.move_ll()
-        else:
-            if self.check_pole_r():
-                self.move_r()
-            elif self.check_pole_rh():
-                self.move_lh()
-            elif self.check_pole_rl():
-                self.move_ll()
-            else:
-                print("Win")
+
+        # if self.check_pole_r():
+        #     self.move_r()
+        # if self.check_pole_rh():
+        #     self.move_lh()
+        # if self.check_pole_rl():
+        #     self.move_ll()
+        # else:
+        #     print("Win")
 
     def restart(self):
         self.rect.x = 430
@@ -266,6 +298,8 @@ class Cat(pygame.sprite.Sprite):
 
 
 def drawpole(n):
+    # for i in range(9):
+    #     Pole(80 * i, 51 * i, 80 * i, 51 * i, True, all_sprites, pole_group)
     for i in range(11):
         for j in range(11):
             y = 45 * i
@@ -285,9 +319,12 @@ def drawpole(n):
                     all_count -= 1
                     count -= 1
             else:
-                Pole(x, y, j, i, True, all_sprites)
+                Pole(x, y, j, i, True, all_sprites, pole_group)
                 all_count -= 1
 
+
+def make_music():
+    Music(1000, 450, True, all_sprites, music_group)
 
 
 pos_x = 430
@@ -306,6 +343,7 @@ def main():
     n = 8
     # start_screen()
     drawpole(n)
+    make_music()
     cat = Cat(pos_x, pos_y, cat_x, cat_y, hero)
     while running:
         time_delta = clock.tick(60) / 1000.0
@@ -347,6 +385,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pole_group.update(event)
+                music_group.update(event)
                 if event.type != pygame_gui.UI_BUTTON_PRESSED:
                     try:
                         hero.update()
