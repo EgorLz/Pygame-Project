@@ -365,7 +365,6 @@ def drawpole(n):
                     all_count -= 1
                 else:
                     Pole(x, y, j, i, False, all_sprites, pole_group)
-                    print(i, j)
                     board[i][j] = 1
                     all_count -= 1
                     count -= 1
