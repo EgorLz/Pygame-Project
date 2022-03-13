@@ -140,10 +140,24 @@ all_sprites = pygame.sprite.Group()
 pole_group = pygame.sprite.Group()
 music_group = pygame.sprite.Group()
 endofgame_group = pygame.sprite.Group()
+vk_group = pygame.sprite.Group()
 
 hero = pygame.sprite.Group()
 board = [['0'] * 11 for _ in range(11)]
 
+class VK(pygame.sprite.Sprite):
+    image = load_image("VK.png")
+
+    def __init__(self, x, y, *group):
+        super().__init__(*group)
+        self.image = VK.image
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
+
+    def update(self, *args):
+        if args and self.rect.collidepoint(args[0].pos):
+            webbrowser.open("https://vk.com/gordei_vk", new=2)
 
 class Music(pygame.sprite.Sprite):
     is_active = True
@@ -194,7 +208,7 @@ class Pole(pygame.sprite.Sprite):
                 self.image = Pole.pole_close
                 start_time = time.time()
                 board[self.pos_y][self.pos_x] = '1'
-                if self.pos_y == 10 and self.pos_y == 10:
+                if self.pos_y == 10 and self.pos_x == 10:
                     webbrowser.open("https://www.youtube.com/watch?v=zLdHDOdpIeU", new=2)
 
 
@@ -319,15 +333,14 @@ class Cat(pygame.sprite.Sprite):
         elif self.check_pole_ll():
             self.move_ll()
             self.image = Cat.image
-
         elif self.check_pole_r():
             self.move_r()
             self.image = Cat.image_r
         elif self.check_pole_rh():
-            self.move_lh()
+            self.move_rh()
             self.image = Cat.image_r
         elif self.check_pole_rl():
-            self.move_ll()
+            self.move_rl()
             self.image = Cat.image_r
         else:
             EndOfGame(300, 20, True, all_sprites, endofgame_group)
@@ -339,8 +352,8 @@ class Cat(pygame.sprite.Sprite):
         self.pos_y = 5
 
 class EndOfGame(pygame.sprite.Sprite):
-    winner = load_image("at-winer.png")
-    loser = load_image("at-looser.png")
+    loser = load_image("at-winer.png")
+    winner = load_image("at-looser.png")
 
     def __init__(self, x, y, is_win=False, *group):
         super().__init__(*group)
@@ -376,8 +389,11 @@ def drawpole(n):
 def make_music():
     Music(1000, 450, True, all_sprites, music_group)
 
+def VK_open():
+    VK(1090, 10, all_sprites, vk_group)
+
 def loss():
-    EndOfGame(300, 20, False, all_sprites, endofgame_group)
+    EndOfGame(300, 50, False, all_sprites, endofgame_group)
 
 
 poscat_x = 430
@@ -392,12 +408,14 @@ clock = pygame.time.Clock()
 
 def main():
     global board
+    board = [['0'] * 11 for _ in range(11)]
     last_time = time.time()
     running = True
     n = 8
     start_screen()
     drawpole(n)
     make_music()
+    VK_open()
     cat = Cat(poscat_x, poscat_y, cat_x, cat_y, hero)
     while running:
         time_delta = clock.tick(60) / 1000.0
@@ -430,6 +448,7 @@ def main():
                     cat.restart()
                     level_sound.play()
                     board = [['0'] * 11 for _ in range(11)]
+
                     drawpole(n)
                 if event.ui_element == info_btn:
                     open_sound.play()
@@ -438,13 +457,14 @@ def main():
             manager.process_events(event)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                vk_group.update(event)
                 pole_group.update(event)
                 music_group.update(event)
                 if event.type != pygame_gui.UI_BUTTON_PRESSED:
                     try:
-                        if cat.rect.x < 0 or cat.rect.x > 970:
+                        if cat.pos_x < 0 or cat.pos_x > 10:
                             loss()
-                        if cat.rect.y < -20 or cat.rect.y > 550:
+                        if cat.pos_y < 0 or cat.pos_y > 10:
                             loss()
                         if time.time() - last_time >= 0.4:
                             last_time = time.time()
