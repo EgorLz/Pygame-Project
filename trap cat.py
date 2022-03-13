@@ -1,10 +1,12 @@
 import os
 import sys
 
+import webbrowser
 import pygame
 import pygame_gui
 import random
 import time
+
 
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
@@ -101,7 +103,7 @@ def info_screen():
                   "Задача: поймать кошку так, чтобы",
                   " она не могла никуда пойти"]
 
-    return_text = ["Нажмите ё для выхода"]
+    return_text = ["Нажмите ` для выхода"]
     pygame.display.set_mode((500, 500))
     pygame.display.set_caption('INFO by lazzzy')
     fon = pygame.transform.scale(load_image('info.jpg'), (500, 500))
@@ -137,9 +139,10 @@ def info_screen():
 all_sprites = pygame.sprite.Group()
 pole_group = pygame.sprite.Group()
 music_group = pygame.sprite.Group()
+endofgame_group = pygame.sprite.Group()
 
 hero = pygame.sprite.Group()
-board = [[0] * 11 for _ in range(11)]
+board = [['0'] * 11 for _ in range(11)]
 
 
 class Music(pygame.sprite.Sprite):
@@ -158,7 +161,7 @@ class Music(pygame.sprite.Sprite):
     def update(self, *args):
         global start_time
         if args and self.rect.collidepoint(args[0].pos):
-            if time.time() - start_time >= 0.7:
+            if time.time() - start_time >= 0.4:
                 start_time = time.time()
                 if Music.is_active:
                     self.image = Music.svykno
@@ -187,119 +190,166 @@ class Pole(pygame.sprite.Sprite):
     def update(self, *args):
         global start_time
         if args and self.rect.collidepoint(args[0].pos):
-            if time.time() - start_time >= 0.7:
+            if time.time() - start_time >= 0.4:
                 self.image = Pole.pole_close
                 start_time = time.time()
-                # board[pos_x][pos_y] = 1
+                board[self.pos_y][self.pos_x] = '1'
+                if self.pos_y == 10 and self.pos_y == 10:
+                    webbrowser.open("https://www.youtube.com/watch?v=zLdHDOdpIeU", new=2)
 
 
 class Cat(pygame.sprite.Sprite):
     image = load_image("cat_stay.png")
+    image_r = load_image("cat_stay_r.png")
 
-    def __init__(self, x, y, pos_x, pos_y, *group):
+    global cat_y, cat_x
+
+    def __init__(self, cat_x, cat_y, pos_x, pos_y, *group):
         super().__init__(*group)
         self.image = Cat.image
         self.rect = self.image.get_rect()
-        self.rect.y = y
-        self.rect.x = x
+        self.rect.y = cat_y
+        self.rect.x = cat_x
         self.pos_x = pos_x
         self.pos_y = pos_y
 
     def check_pole_l(self):
-        if board[self.pos_y][self.pos_x - 1] == 0:
+        if board[self.pos_y][self.pos_x - 1] == '0':
             return True
         else:
             return False
 
     def check_pole_lh(self):
-        if board[self.pos_y - 1][self.pos_x] == 0:
-            return True
+        if self.pos_y % 2 == 1:
+            if board[self.pos_y - 1][self.pos_x - 1] == '0':
+                return True
+            else:
+                return False
         else:
-            return False
+            if board[self.pos_y - 1][self.pos_x] == '0':
+                return True
+            else:
+                return False
 
     def check_pole_ll(self):
-        if board[self.pos_y + 1][self.pos_x] == 0:
-            return True
+        if self.pos_y % 2 == 1:
+            if board[self.pos_y + 1][self.pos_x - 1] == '0':
+                return True
+            else:
+                return False
         else:
-            return False
+            if board[self.pos_y + 1][self.pos_x] == '0':
+                return True
+            else:
+                return False
 
     def check_pole_r(self):
-        if board[self.pos_y][self.pos_x + 1] == 0:
+        if board[self.pos_y][self.pos_x + 1] == '0':
             return True
         else:
             return False
 
     def check_pole_rh(self):
-        if board[self.pos_y - 1][self.pos_x + 1] == 0:
-            return True
+        if self.pos_y % 2 == 1:
+            if board[self.pos_y - 1][self.pos_x] == '0':
+                return True
+            else:
+                return False
         else:
-            return False
+            if board[self.pos_y - 1][self.pos_x + 1] == '0':
+                return True
+            else:
+                return False
 
     def check_pole_rl(self):
-        if board[self.pos_y + 1][self.pos_x + 1] == 0:
-            return True
+        if self.pos_y % 2 == 1:
+            if board[self.pos_y + 1][self.pos_x] == '0':
+                return True
+            else:
+                return False
         else:
-            return False
+            if board[self.pos_y + 1][self.pos_x + 1] == '0':
+                return True
+            else:
+                return False
 
     def move_l(self):
         self.rect.x -= 85
         self.pos_x -= 1
 
     def move_lh(self):
+        if self.pos_y % 2 == 1:
+            self.pos_x -= 1
         self.pos_y -= 1
-        self.rect.x -= 42
-        self.rect.y -= 50
+        self.rect.x -= 40
+        self.rect.y -= 45
 
     def move_ll(self):
+        if self.pos_y % 2 == 1:
+            self.pos_x -= 1
         self.pos_y += 1
-        self.rect.x -= 42
-        self.rect.y += 50
+        self.rect.x -= 40
+        self.rect.y += 45
 
     def move_r(self):
         self.rect.x += 85
         self.pos_x += 1
 
     def move_rh(self):
+        if self.pos_y == 0:
+            self.pos_x += 1
         self.pos_y -= 1
-        self.pos_x += 1
-        self.rect.x += 42
-        self.rect.y -= 50
+        self.rect.x += 40
+        self.rect.y -= 45
 
     def move_rl(self):
+        if self.pos_y == 0:
+            self.pos_x += 1
         self.pos_y += 1
-        self.pos_x += 1
         self.rect.x += 42
-        self.rect.y += 50
+        self.rect.y += 45
 
     def update(self):
-        if self.rect.x < 0:
-            print("Loss")
         if self.check_pole_l():
             self.move_l()
+            self.image = Cat.image
         elif self.check_pole_lh():
             self.move_lh()
+            self.image = Cat.image
         elif self.check_pole_ll():
             self.move_ll()
+            self.image = Cat.image
 
-        # if self.check_pole_r():
-        #     self.move_r()
-        # if self.check_pole_rh():
-        #     self.move_lh()
-        # if self.check_pole_rl():
-        #     self.move_ll()
-        # else:
-        #     print("Win")
+        elif self.check_pole_r():
+            self.move_r()
+            self.image = Cat.image_r
+        elif self.check_pole_rh():
+            self.move_lh()
+            self.image = Cat.image_r
+        elif self.check_pole_rl():
+            self.move_ll()
+            self.image = Cat.image_r
+        else:
+            EndOfGame(300, 20, True, all_sprites, endofgame_group)
 
     def restart(self):
         self.rect.x = 430
         self.rect.y = 190
-        self.pos_x = 6
-        self.pos_y = 6
+        self.pos_x = 5
+        self.pos_y = 5
 
+class EndOfGame(pygame.sprite.Sprite):
+    winner = load_image("at-winer.png")
+    loser = load_image("at-looser.png")
+
+    def __init__(self, x, y, is_win=False, *group):
+        super().__init__(*group)
+        self.image = EndOfGame.winner if is_win else EndOfGame.loser
+        self.rect = self.image.get_rect()
+        self.rect.y = y
+        self.rect.x = x
 
 def drawpole(n):
-    # for i in range(9):
-    #     Pole(80 * i, 51 * i, 80 * i, 51 * i, True, all_sprites, pole_group)
     for i in range(11):
         for j in range(11):
             y = 45 * i
@@ -310,11 +360,12 @@ def drawpole(n):
             count = 8
             all_count = 121
             if random.randint(1, all_count) <= count:
-                if i == 6 and j == 6:
+                if i == 5 and j == 5:
                     Pole(x, y, j, i, True, all_sprites, pole_group)
                     all_count -= 1
                 else:
                     Pole(x, y, j, i, False, all_sprites, pole_group)
+                    print(i, j)
                     board[i][j] = 1
                     all_count -= 1
                     count -= 1
@@ -326,11 +377,14 @@ def drawpole(n):
 def make_music():
     Music(1000, 450, True, all_sprites, music_group)
 
+def loss():
+    EndOfGame(300, 20, False, all_sprites, endofgame_group)
 
-pos_x = 430
-pos_y = 190
-cat_x = 6
-cat_y = 6
+
+poscat_x = 430
+poscat_y = 190
+cat_x = 5
+cat_y = 5
 
 start_time = time.time()
 
@@ -339,12 +393,13 @@ clock = pygame.time.Clock()
 
 def main():
     global board
+    last_time = time.time()
     running = True
     n = 8
-    # start_screen()
+    start_screen()
     drawpole(n)
     make_music()
-    cat = Cat(pos_x, pos_y, cat_x, cat_y, hero)
+    cat = Cat(poscat_x, poscat_y, cat_x, cat_y, hero)
     while running:
         time_delta = clock.tick(60) / 1000.0
         clock.tick(FPS)
@@ -375,7 +430,7 @@ def main():
                 if event.ui_element == start_btn:
                     cat.restart()
                     level_sound.play()
-                    board = [[0] * 11 for _ in range(11)]
+                    board = [['0'] * 11 for _ in range(11)]
                     drawpole(n)
                 if event.ui_element == info_btn:
                     open_sound.play()
@@ -388,6 +443,12 @@ def main():
                 music_group.update(event)
                 if event.type != pygame_gui.UI_BUTTON_PRESSED:
                     try:
+                        if cat.rect.x < 0 or cat.rect.x > 970:
+                            loss()
+                        if cat.rect.y < -20 or cat.rect.y > 550:
+                            loss()
+                        if time.time() - last_time >= 0.4:
+                            last_time = time.time()
                         hero.update()
                     except IndexError:
                         pass
