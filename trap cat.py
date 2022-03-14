@@ -7,7 +7,6 @@ import pygame_gui
 import random
 import time
 
-
 pygame.display.set_icon(pygame.image.load("./data/icon.png"))
 pygame.init()
 size = width, height = 1150, 500
@@ -141,9 +140,10 @@ pole_group = pygame.sprite.Group()
 music_group = pygame.sprite.Group()
 endofgame_group = pygame.sprite.Group()
 vk_group = pygame.sprite.Group()
-
 hero = pygame.sprite.Group()
+
 board = [['0'] * 11 for _ in range(11)]
+
 
 class VK(pygame.sprite.Sprite):
     image = load_image("VK.png")
@@ -158,6 +158,7 @@ class VK(pygame.sprite.Sprite):
     def update(self, *args):
         if args and self.rect.collidepoint(args[0].pos):
             webbrowser.open("https://vk.com/gordei_vk", new=2)
+
 
 class Music(pygame.sprite.Sprite):
     is_active = True
@@ -351,6 +352,7 @@ class Cat(pygame.sprite.Sprite):
         self.pos_x = 5
         self.pos_y = 5
 
+
 class EndOfGame(pygame.sprite.Sprite):
     loser = load_image("at-winer.png")
     winner = load_image("at-looser.png")
@@ -361,6 +363,7 @@ class EndOfGame(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.y = y
         self.rect.x = x
+
 
 def drawpole(n):
     for i in range(11):
@@ -389,11 +392,21 @@ def drawpole(n):
 def make_music():
     Music(1000, 450, True, all_sprites, music_group)
 
+
 def VK_open():
     VK(1090, 10, all_sprites, vk_group)
 
+
 def loss():
     EndOfGame(300, 50, False, all_sprites, endofgame_group)
+
+
+def group_clear():
+    endofgame_group.empty()
+    pole_group.empty()
+    for sprite in all_sprites:
+        if isinstance(sprite, EndOfGame) or isinstance(sprite, Pole):
+            all_sprites.remove(sprite)
 
 
 poscat_x = 430
@@ -445,11 +458,13 @@ def main():
                     n = 6
                     open_sound.play()
                 if event.ui_element == start_btn:
+                    group_clear()
                     cat.restart()
                     level_sound.play()
                     board = [['0'] * 11 for _ in range(11)]
-
                     drawpole(n)
+                    print(all_sprites)
+                    print(endofgame_group)
                 if event.ui_element == info_btn:
                     open_sound.play()
                     info_screen()
@@ -472,6 +487,7 @@ def main():
                     except IndexError:
                         pass
         screen.blit(background, (970, 0))
+        screen.fill("white")
         all_sprites.draw(screen)
         hero.draw(screen)
         all_sprites.update()
