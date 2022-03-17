@@ -463,8 +463,6 @@ def main():
                     level_sound.play()
                     board = [['0'] * 11 for _ in range(11)]
                     drawpole(n)
-                    print(all_sprites)
-                    print(endofgame_group)
                 if event.ui_element == info_btn:
                     open_sound.play()
                     info_screen()
